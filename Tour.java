@@ -69,6 +69,7 @@ public class Tour
         size = 0;
     }
 
+    
     // ADD YOUR METHODS BELOW HERE
     public String toString() {
     String output = "";  
@@ -175,18 +176,25 @@ public class Tour
         current = head;
         double smallestDifference = Double.MAX_VALUE;
 
-        //iterate through
         while (current.next != null && current.next != head){
             //distance calculation
             double diff = current.p.distanceTo(p) + current.next.p.distanceTo(p) - current.p.distanceTo(current.next.p);
 
-            //track smallest distance
+            //tracking smallest
             if (diff < smallestDifference) {
                 smallestDifference = diff;
 
                 nearest = current;
             }
             current = current.next;
+        }
+        //checking end to head
+        double diff = current.p.distanceTo(p) + head.p.distanceTo(p) - current.p.distanceTo(head.p);
+
+        if (diff < smallestDifference) {
+            smallestDifference = diff;
+
+            nearest = current;
         }
         
         //insert and increment
