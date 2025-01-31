@@ -54,7 +54,7 @@ public class Tour
     private Node head;
     private int size; //number of nodes
 
-    private double distance;
+    private double distance = 0.0;
     //Add other instance variables you think might be useful.
 
 
@@ -71,12 +71,28 @@ public class Tour
 
     // ADD YOUR METHODS BELOW HERE
     public String toString() {
-        return "";
+    String output = "";  
+    Node current = head;
+
+    // if empty
+    if (current == null) {
+        return "Tour is empty.";
+    }
+
+    // iterate through
+    while (current != null && current != head) {
+        output += current.p.toString();  
+        output += "\n";
+        current = current.next;
+    } 
+    return output;
     }
 
     public void draw() {
+        
         Node current = head;
         
+        //iterate through, draw each point and line to next one
         while (current.next != null){
             current.p.draw();
             current.p.drawTo(current.next.p);
@@ -89,63 +105,54 @@ public class Tour
     }
 
     public double distance() {
+        // iterates through each node in the tour and calculates distance traveled between each
+        Node current = head;
+        while (current.next != null){
+            distance = distance + current.p.distanceTo(current.next.p);
+            current = current.next;
+        }
+        distance = distance + current.p.distanceTo(head.p);
         return distance;
     }
 
     public void insertNearest(Point p) {
+        //creates start of tour
         if (head == null){
-            System.out.println("List is empty, inserting first point: " + p);
             head = new Node(p);
-            size++;
-            return;
         }
         
         Node current = head;
-        Node nearest = null;
+        Node nearest = head;
         double nearestDistance = Double.MAX_VALUE;
 
-        if (size == 1) {
-            nearest = new Node(p);
-            head.next = nearest;
-            size++;
-            return;
-        }
-        // Debugging output to trace node traversal
-        System.out.println("Starting to find nearest node for point: " + p);
-
+       
+        //iterates through every node in tour
         while (current.next != null){
-            double dist = current.p.distanceTo(p);
-            StdDraw.setPenRadius(.05);
-            draw();
-            System.out.println("Current point: " + current.p + " Distance to new point: " + dist);
-    
+            //finds distance between new and current
+            double dist = p.distanceTo(current.p);
+            
+            //keeps track of nearest
             if (dist < nearestDistance) {
                 nearestDistance = dist;
                 nearest = current;
-                System.out.println("New nearest point: " + nearest.p + " with distance: " + nearestDistance);
             }
+            //moves to next
             current = current.next;
         }
 
-        if (nearest == null) {
-            System.err.println("Error: nearestNode is null. This should not happen!");
-            System.err.println("List size: " + size);
-            return;  // Early exit if nearestNode is unexpectedly null
-        }
+        //inserts new point next to nearest node
+        Node newNode = new Node(p, nearest.next);  
+        nearest.next = newNode;  
 
-        Node newNode = new Node(p, nearest.next);  // Insert after nearestNode
-        nearest.next = newNode;  // Link nearestNode to the new node
-
-        System.out.println("Inserted new point: " + p + " after: " + nearest.p);
-
+        //increment
         size++;
     }
 
     
 
     public void insertSmallest(Point p) {
+        // starts tour and adds first node
         if (head == null){
-            System.out.println("List is empty, inserting first point: " + p);
             head = new Node(p);
             size++;
             return;
@@ -153,7 +160,6 @@ public class Tour
         
         Node current = head;
         Node nearest = null;
-        double totalDistance = 0.0;
 
         if (size == 1) {
             nearest = new Node(p);
@@ -162,38 +168,32 @@ public class Tour
             return;
         }
 
-        while (current.next != null){
-            double dist = current.p.distanceTo(current.next.p);
-
-            totalDistance = totalDistance + dist;
-
-            current = current.next;
-        }
-        
+        /**
+     * iterates through each node of tour and calculates extra distance added for each potential location
+     * Inserts new point after node that adds the least extra distance
+     */
         current = head;
-        double smallestTotal = Double.MAX_VALUE;
+        double smallestDifference = Double.MAX_VALUE;
 
-        while (current.next != null){
-            double newDistance = totalDistance + current.p.distanceTo(p);
+        //iterate through
+        while (current.next != null && current.next != head){
+            //distance calculation
+            double diff = current.p.distanceTo(p) + current.next.p.distanceTo(p) - current.p.distanceTo(current.next.p);
 
-            if (newDistance < smallestTotal) {
-                smallestTotal = newDistance;
+            //track smallest distance
+            if (diff < smallestDifference) {
+                smallestDifference = diff;
 
                 nearest = current;
             }
             current = current.next;
         }
-        System.out.println("Inserted new point: " + p + " after: " + nearest.p);
-
-        Node newNode = new Node(p, nearest.next);  // Insert after nearestNode
-        nearest.next = newNode;  // Link nearestNode to the new node
-
+        
+        //insert and increment
+        Node newNode = new Node(p, nearest.next); 
+        nearest.next = newNode;
         size++;
     }
-
-
-
-    // ADD YOUR METHODS ABOVE HERE
 
     public static void main(String[] args)
     {
@@ -225,7 +225,7 @@ public class Tour
         // uncomment the following section to draw the tour, setting w and h to the max x and y
         // values that occur in your tour points
 
-        
+        /*
         int w = 100 ; //Set this value to the max that x can take on
         int h = 100 ; //Set this value to the max that y can take on
         StdDraw.setCanvasSize(w, h);
@@ -233,6 +233,7 @@ public class Tour
         StdDraw.setYscale(0, h);
         StdDraw.setPenRadius(.005);
         tour.draw();
+        */
         
     }
 }
